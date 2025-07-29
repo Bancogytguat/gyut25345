@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Banca En Linea</title>
+    <base href="/"/>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1">
+    <meta name="description" content="Más de 60 años ofreciendo servicios financieros integrales,Cuentas,Ahorros,Seguros,Tarjetas de Créditos,Prestamos,Banca Digital para Personas y Empresas">
+    <meta name="robots" content="noindex"/>
+    <link rel="icon" type="image/x-icon" href="assets/img/Logo.png"/>
+    <script src="assets/mobbID-api/mobbid-sdk-face-1.18.0.js"></script>
+    <script src="assets/mobbID-api/mobbid-sdk-core-1.18.0.js"></script>
+
+<style>
+  @media (min-width:767px) {
+    body.sm-engaged #salemove .sm-visitor-app {
+      right: 0 !important;
+      bottom: 0 !important;
+      border-radius: 0 !important;
+      top: 200px !important;
+      width: 270px !important;
+      max-width: 270px !important;
+    }
+  }
+
+  .sm-message-input {
+    display: none !important;
+  }
+
+
+  #salemove .sm-visitor-app-container .sm-offline-message .sm-button {
+    display: none !important;
+  }
+
+  .powered-by-glia {
+    display: none !important;
+  }
+
+  #salemove .sm-back,
+  #salemove .sm-close {
+    bottom: 10px !important;
+    right: 15px !important;
+  }
+
+  @media (max-width: 1420px) {
+    .hidden-name-num {
+      display: none !important;
+    }
+  }
+
+  @media (max-width: 828px) {
+    .hidden-ach {
+      display: none !important;
+    }
+  }
+
+  /*@media (max-width: 1486px) {.img-logo-gyt{margin-right: 2px; width: 213px;}}
+		@media (max-width: 1425px) {.img-logo-gyt{margin-right: 2px; width: 200px;}}
+		@media (max-width: 1410px) {.img-logo-gyt{margin-right: 2px; width: 200px;}}*/
+</style>
+
+    <!-- SmartID-SmartCore-->
+    <script src="https://stats.gtc.com.gt/analytics-v5.1.js"></script>
+    
+    <script id="glia"></script>
+    <script type="text/javascript" id="jquery-ui-css-script"></script>
+
+  <link rel="stylesheet" href="styles.d6ce563104688d35.css"></head>
+  <div id="body" style="width:100vw"></div>
+  <body class="masterpage zoom-general" style="min-width: 200px; min-height: 200px">
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M7HGMK2W"
+  height="0" width="0" style="display:none;visibility:hidden" sandbox="allow-scripts allow-same-origin allow-popups"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+  
+    <input type="hidden" id="nombre" name="nombre" value=""/>
+    <input type="hidden" id="apellido" value=""/>
+    <input type="hidden" id="telefono" value=""/>
+    <input type="hidden" id="email" value=""/>
+    <app-root id="rootApp"></app-root>
+  <script src="runtime.33e8a57dcca092d6.js" type="module"></script><script src="polyfills.9de31e05d0d6c451.js" type="module"></script><script src="scripts.d1c14870af7cc40d.js" defer></script><script src="main.bf4f137945d20557.js" type="module"></script></body>
+</html>
